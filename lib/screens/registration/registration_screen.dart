@@ -238,26 +238,31 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                               },
                             ),
                             const SizedBox(height: 24),
-                            ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade700,
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          ),
-                          onPressed: _submitForm,
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade700,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16.0,
+                                  ),
+                                ),
+                                onPressed: _submitForm,
+                                child: const Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
                             const SizedBox(height: 12),
                             TextButton(
                               style: TextButton.styleFrom(
                                 backgroundColor: Colors.transparent,
-                                
+
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16.0,
                                   horizontal: 24.0,
