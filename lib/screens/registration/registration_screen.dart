@@ -94,7 +94,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
         children: [
           SizedBox.expand(
             child: Image.asset(
-              'assets/images/login_background.png',
+              'assets/maasai_mara.png',
               fit: BoxFit.cover,
             ),
           ),
