@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
+import 'package:http/http.dart' as http;
 import 'package:techhackportal/screens/login/login_screen.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
@@ -32,53 +33,51 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
 
   bool showError = false;
 
-  Future<void> _fetchStudentDetailsByUPI() async {
-    final upi = _upiController.text.trim();
-    if (upi.isEmpty) return;
-    setState(() {
-      _isLoading = true;
-      showError = false;
-    });
-    //await Future.delayed(const Duration(seconds: 1));
-        final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    String url = "student-nemis-dbb3c9etf0bbgqd5.southafricanorth-01.azurewebsites.net/api/students/student-profile/$upi";
-    final http = new IOClient(ioc);
-    try {
-      var response = await http.get(
-        Uri.parse(url),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      ).timeout(const Duration(seconds: 40));
-    
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        if (decoded != null) {
-          setState(() {
-            _firstNameController.text = decoded['fullName']['firstName'] ?? '';
-            _middleNameController.text = decoded['fullName']['middleName'] ?? '';
-            _lastNameController.text = decoded['fullName']['lastName'] ?? '';
-            _selectedGender = decoded['gender'] ?? '';
-            _dobController.text = decoded['dateOfBirth'] ?? '';
-            _nationalityController.text = decoded['nationality'] ?? '';
-          });
-        }else{
+Future<void> _fetchStudentDetailsByUPI() async {
+  final upi = _upiController.text.trim();
+  if (upi.isEmpty) return;
 
-          setState(() {
-            showError = true;
-            _isLoading = false;
-          });
-        }
+  setState(() {
+    _isLoading = true;
+    showError = false;
+  });
+
+  final url = "https://student-nemis-dbb3c9etf0bbgqd5.southafricanorth-01.azurewebsites.net/api/students/student-profile/$upi";
+
+  try {
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+    ).timeout(const Duration(seconds: 40));
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      if (decoded != null) {
+        setState(() {
+          _firstNameController.text = decoded['fullName']['firstName'] ?? '';
+          _middleNameController.text = decoded['fullName']['middleName'] ?? '';
+          _lastNameController.text = decoded['fullName']['lastName'] ?? '';
+          _selectedGender = decoded['gender'] ?? '';
+          _dobController.text = decoded['dateOfBirth'] ?? '';
+          _nationalityController.text = decoded['nationality'] ?? '';
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          showError = true;
+          _isLoading = false;
+        });
       }
-      
-    } on SocketException catch (e) {
-    } on TimeoutException catch (e) {
-    } catch (e) {}
-
-
+    } else {
+      setState(() => _isLoading = false);
+    }
+  } catch (e) {
+    setState(() {
+      showError = true;
+      _isLoading = false;
+    });
   }
+}
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
