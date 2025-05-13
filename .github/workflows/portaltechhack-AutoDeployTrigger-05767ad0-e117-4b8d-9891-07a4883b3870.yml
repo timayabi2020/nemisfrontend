@@ -1,0 +1,48 @@
+name: Trigger auto deployment for portaltechhack
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/portaltechhack-AutoDeployTrigger-05767ad0-e117-4b8d-9891-07a4883b3870.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.PORTALTECHHACK_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.PORTALTECHHACK_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.PORTALTECHHACK_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}
+          _dockerfilePathKey_: _dockerfilePath_
+          registryUrl: 
+          registryUsername: ${{ secrets.PORTALTECHHACK_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.PORTALTECHHACK_REGISTRY_PASSWORD }}
+          containerAppName: portaltechhack
+          resourceGroup: AzureFundamentals
+          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
