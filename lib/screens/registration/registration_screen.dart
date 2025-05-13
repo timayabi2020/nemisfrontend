@@ -67,7 +67,9 @@ Future<void> _fetchStudentDetailsByUPI() async {
         });
       }
     } else {
-      setState(() => _isLoading = false);
+      setState(() { _isLoading = false;
+        showError = true;
+      });
     }
   } catch (e) {
     setState(() {
