@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/io_client.dart';
 import 'package:techhackportal/screens/login/login_screen.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
@@ -21,22 +26,58 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
   final TextEditingController _emailController = TextEditingController();
 
   String? _selectedGender;
+  String noStudentFound = "No student found with this UPI";
+
+  bool _isLoading = false;
+
+  bool showError = false;
 
   Future<void> _fetchStudentDetailsByUPI() async {
     final upi = _upiController.text.trim();
     if (upi.isEmpty) return;
-
-    await Future.delayed(const Duration(seconds: 1));
-
     setState(() {
-      _firstNameController.text = "John";
-      _middleNameController.text = "Kamau";
-      _lastNameController.text = "Mwangi";
-      _selectedGender = "Male";
-      _dobController.text = "2010-06-15";
-      _nationalityController.text = "Kenyan";
-      _emailController.text = "john.mwangi@example.com";
+      _isLoading = true;
+      showError = false;
     });
+    //await Future.delayed(const Duration(seconds: 1));
+        final ioc = new HttpClient();
+    ioc.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    String url = "student-nemis-dbb3c9etf0bbgqd5.southafricanorth-01.azurewebsites.net/api/students/student-profile/$upi";
+    final http = new IOClient(ioc);
+    try {
+      var response = await http.get(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ).timeout(const Duration(seconds: 40));
+    
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded != null) {
+          setState(() {
+            _firstNameController.text = decoded['fullName']['firstName'] ?? '';
+            _middleNameController.text = decoded['fullName']['middleName'] ?? '';
+            _lastNameController.text = decoded['fullName']['lastName'] ?? '';
+            _selectedGender = decoded['gender'] ?? '';
+            _dobController.text = decoded['dateOfBirth'] ?? '';
+            _nationalityController.text = decoded['nationality'] ?? '';
+          });
+        }else{
+
+          setState(() {
+            showError = true;
+            _isLoading = false;
+          });
+        }
+      }
+      
+    } on SocketException catch (e) {
+    } on TimeoutException catch (e) {
+    } catch (e) {}
+
+
   }
 
   void _submitForm() {
@@ -153,6 +194,21 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                                 ),
                               ],
                             ),
+                            _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : const SizedBox.shrink(),
+
+                            showError
+                                ? const Text(
+                                    'No student found with this UPI',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 16.0,
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _firstNameController,
