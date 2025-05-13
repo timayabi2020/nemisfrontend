@@ -46,7 +46,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LEMON_DUNE_0131F1B0F }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "."                 # Location of source (irrelevant if skip_app_build is true)
+          app_location: "build/web"                 # Location of source (irrelevant if skip_app_build is true)
           output_location: "build/web"      # Where index.html lives after build
           skip_app_build: true              # ✅ Prevent Azure from trying to build again
 
