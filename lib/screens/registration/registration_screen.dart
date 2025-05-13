@@ -198,10 +198,10 @@ Future<void> _fetchStudentDetailsByUPI() async {
                                 : const SizedBox.shrink(),
 
                             showError
-                                ? const Text(
+                                ? Text(
                                     'No student found with this UPI',
                                     style: TextStyle(
-                                      color: Colors.red,
+                                      color: Colors.red[900],
                                       fontSize: 16.0,
                                     ),
                                   )
@@ -295,7 +295,7 @@ Future<void> _fetchStudentDetailsByUPI() async {
                               width: double.infinity,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red.shade700,
+                                  backgroundColor: Colors.white70,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16.0,
                                   ),
@@ -306,7 +306,7 @@ Future<void> _fetchStudentDetailsByUPI() async {
                                   style: TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: Colors.black87,
                                   ),
                                 ),
                               ),
