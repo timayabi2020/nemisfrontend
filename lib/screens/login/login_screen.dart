@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:techhackportal/screens/registration/registration_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -118,6 +120,16 @@ class LoginScreen extends StatelessWidget {
                               TextSpan(
                                 text: 'Sign up',
                                 style: TextStyle(color: Colors.white70),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    // Navigate to registration screen
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const StudentRegistrationScreen(),
+                                      ),
+                                    );
+                                  },
                               ),
                             ],
                           ),
