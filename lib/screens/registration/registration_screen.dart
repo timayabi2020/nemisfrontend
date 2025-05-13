@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:techhackportal/screens/login/login_screen.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
   const StudentRegistrationScreen({super.key});
 
   @override
-  State<StudentRegistrationScreen> createState() => _StudentRegistrationScreenState();
+  State<StudentRegistrationScreen> createState() =>
+      _StudentRegistrationScreenState();
 }
 
 class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
@@ -41,22 +43,24 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     if (_formKey.currentState!.validate()) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Success'),
-          content: const Text('Student registration submitted.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            )
-          ],
-        ),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Success'),
+              content: const Text('Student registration submitted.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
       );
     }
   }
 
   Future<void> _pickDateOfBirth() async {
-    DateTime initialDate = DateTime.tryParse(_dobController.text) ?? DateTime(2010);
+    DateTime initialDate =
+        DateTime.tryParse(_dobController.text) ?? DateTime(2010);
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -65,7 +69,8 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     );
     if (picked != null) {
       setState(() {
-        _dobController.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+        _dobController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
   }
@@ -73,6 +78,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
+      labelStyle: const TextStyle(color: Colors.white70),
       hintStyle: const TextStyle(color: Colors.white70),
       filled: true,
       fillColor: Colors.transparent,
@@ -93,10 +99,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
       body: Stack(
         children: [
           SizedBox.expand(
-            child: Image.asset(
-              'assets/maasai_mara.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/maasai_mara.png', fit: BoxFit.cover),
           ),
           Container(
             color: Colors.green.withOpacity(0.7),
@@ -124,107 +127,168 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                           key: const ValueKey('registration_form'),
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                          Row(
-                            children: [
-                              Expanded(
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _upiController,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: _inputDecoration(
+                                      'Unique Personal Identifier (UPI)',
+                                    ),
+                                    validator:
+                                        (value) =>
+                                            value == null || value.isEmpty
+                                                ? 'UPI is required'
+                                                : null,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.search,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: _fetchStudentDetailsByUPI,
+                                  tooltip: "Fetch details",
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _firstNameController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('First Name'),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'First name is required'
+                                          : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _middleNameController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('Middle Name'),
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _lastNameController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('Last Name'),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Last name is required'
+                                          : null,
+                            ),
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: _selectedGender,
+                              decoration: _inputDecoration('Gender'),
+                              dropdownColor: Colors.green.shade700,
+                              items:
+                                  ['Male', 'Female']
+                                      .map(
+                                        (gender) => DropdownMenuItem(
+                                          value: gender,
+                                          child: Text(
+                                            gender,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged:
+                                  (value) =>
+                                      setState(() => _selectedGender = value),
+                            ),
+                            const SizedBox(height: 16),
+                            GestureDetector(
+                              onTap: _pickDateOfBirth,
+                              child: AbsorbPointer(
                                 child: TextFormField(
-                                  controller: _upiController,
+                                  controller: _dobController,
                                   style: const TextStyle(color: Colors.white),
-                                  decoration: _inputDecoration('Unique Personal Identifier (UPI)'),
-                                  validator: (value) =>
-                                      value == null || value.isEmpty ? 'UPI is required' : null,
+                                  decoration: _inputDecoration('Date of Birth'),
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.search, color: Colors.white),
-                                onPressed: _fetchStudentDetailsByUPI,
-                                tooltip: "Fetch details",
-                              )
-                            ],
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _nationalityController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('Nationality'),
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _emailController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('Email Address'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty)
+                                  return 'Email is required';
+                                final emailRegex = RegExp(
+                                  r'^[^@]+@[^@]+\.[^@]+',
+                                );
+                                return emailRegex.hasMatch(value)
+                                    ? null
+                                    : 'Invalid email';
+                              },
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade700,
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
                           ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _firstNameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: _inputDecoration('First Name'),
-                            validator: (value) =>
-                                value == null || value.isEmpty ? 'First name is required' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _middleNameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: _inputDecoration('Middle Name'),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _lastNameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: _inputDecoration('Last Name'),
-                            validator: (value) =>
-                                value == null || value.isEmpty ? 'Last name is required' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
-                            value: _selectedGender,
-                            decoration: _inputDecoration('Gender'),
-                            dropdownColor: Colors.green.shade700,
-                            items: ['Male', 'Female']
-                                .map((gender) => DropdownMenuItem(
-                                      value: gender,
-                                      child: Text(gender, style: const TextStyle(color: Colors.white)),
-                                    ))
-                                .toList(),
-                            onChanged: (value) => setState(() => _selectedGender = value),
-                          ),
-                          const SizedBox(height: 16),
-                          GestureDetector(
-                            onTap: _pickDateOfBirth,
-                            child: AbsorbPointer(
-                              child: TextFormField(
-                                controller: _dobController,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: _inputDecoration('Date of Birth'),
-                              ),
+                          onPressed: _submitForm,
+                          child: const Text(
+                            'Submit',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _nationalityController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: _inputDecoration('Nationality'),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _emailController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: _inputDecoration('Email Address'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) return 'Email is required';
-                              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                              return emailRegex.hasMatch(value) ? null : 'Invalid email';
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: _submitForm,
-                            child: const Text('Submit'),
-                          ),
-                          const SizedBox(height: 12),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Already have an account? Login'),
-                          )
-                        ],
+                        ),
+                            const SizedBox(height: 12),
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 24.0,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'Already have an account? Login',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          )),
+          ),
         ],
       ),
     );
