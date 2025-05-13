@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +42,8 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 24.0),
                       TextField(
                         decoration: InputDecoration(
-                          hintText: 'Email Address',
-                          prefixIcon: const Icon(Icons.email, color: Colors.white),
+                          hintText: 'Unique Personal Identifier',
+                          prefixIcon: const Icon(Icons.person_2_rounded, color: Colors.white),
                           hintStyle: const TextStyle(color: Colors.white70),
                           filled: true,
                           fillColor: Colors.transparent,
