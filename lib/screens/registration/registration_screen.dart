@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:techhackportal/screens/login/login_screen.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
   const StudentRegistrationScreen({super.key});
@@ -71,6 +70,23 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     }
   }
 
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      hintStyle: const TextStyle(color: Colors.white70),
+      filled: true,
+      fillColor: Colors.transparent,
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.white),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.white),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +94,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
         children: [
           SizedBox.expand(
             child: Image.asset(
-              'assets/maasai_mara.png',
+              'assets/images/login_background.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -92,19 +108,29 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Form(
                       key: _formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+                      child: TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 800),
+                        tween: Tween<double>(begin: 0, end: 1),
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Column(
+                          key: const ValueKey('registration_form'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                           Row(
                             children: [
                               Expanded(
                                 child: TextFormField(
                                   controller: _upiController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Unique Personal Identifier (UPI)',
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                  ),
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: _inputDecoration('Unique Personal Identifier (UPI)'),
                                   validator: (value) =>
                                       value == null || value.isEmpty ? 'UPI is required' : null,
                                 ),
@@ -119,75 +145,60 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _firstNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'First Name',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _inputDecoration('First Name'),
                             validator: (value) =>
                                 value == null || value.isEmpty ? 'First name is required' : null,
                           ),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _middleNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Middle Name',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _inputDecoration('Middle Name'),
                           ),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _lastNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Last Name',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _inputDecoration('Last Name'),
                             validator: (value) =>
                                 value == null || value.isEmpty ? 'Last name is required' : null,
                           ),
+                          const SizedBox(height: 16),
                           DropdownButtonFormField<String>(
                             value: _selectedGender,
-                            decoration: const InputDecoration(
-                              labelText: 'Gender',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                            decoration: _inputDecoration('Gender'),
+                            dropdownColor: Colors.green.shade700,
                             items: ['Male', 'Female']
                                 .map((gender) => DropdownMenuItem(
                                       value: gender,
-                                      child: Text(gender),
+                                      child: Text(gender, style: const TextStyle(color: Colors.white)),
                                     ))
                                 .toList(),
                             onChanged: (value) => setState(() => _selectedGender = value),
                           ),
+                          const SizedBox(height: 16),
                           GestureDetector(
                             onTap: _pickDateOfBirth,
                             child: AbsorbPointer(
                               child: TextFormField(
                                 controller: _dobController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Date of Birth',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                ),
+                                style: const TextStyle(color: Colors.white),
+                                decoration: _inputDecoration('Date of Birth'),
                               ),
                             ),
                           ),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _nationalityController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nationality',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _inputDecoration('Nationality'),
                           ),
+                          const SizedBox(height: 16),
                           TextFormField(
                             controller: _emailController,
-                            decoration: const InputDecoration(
-                              labelText: 'Email Address',
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _inputDecoration('Email Address'),
                             validator: (value) {
                               if (value == null || value.isEmpty) return 'Email is required';
                               final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
@@ -202,12 +213,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                           const SizedBox(height: 12),
                           TextButton(
                             onPressed: () {
-                                                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const LoginScreen(),
-                                      ),
-                                    );// or navigate to login screen
+                              Navigator.of(context).pop();
                             },
                             child: const Text('Already have an account? Login'),
                           )
@@ -218,7 +224,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                 ),
               ),
             ),
-          ),
+          )),
         ],
       ),
     );
