@@ -26,6 +26,14 @@ jobs:
         with:
           flutter-version: '3.7.2'  # adjust if needed
 
+      - name: Force Dart to match Flutter SDK
+        run: echo "$FLUTTER_ROOT/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+
+      - name: Show Flutter & Dart versions
+        run: |
+          flutter --version
+          dart --version
+
       - name: Enable Flutter Web
         run: flutter config --enable-web
       - name: Clean up examples
