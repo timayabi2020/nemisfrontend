@@ -31,53 +31,76 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
 
   bool showError = false;
 
-Future<void> _fetchStudentDetailsByUPI() async {
-  final upi = _upiController.text.trim();
-  if (upi.isEmpty) return;
+  Future<void> _fetchStudentDetailsByUPI() async {
+    final upi = _upiController.text.trim();
+    if (upi.isEmpty) return;
 
-  setState(() {
-    _isLoading = true;
-    showError = false;
-  });
+    setState(() {
+      _isLoading = true;
+      showError = false;
+    });
 
-  final url = "https://student-nemis-dbb3c9etf0bbgqd5.southafricanorth-01.azurewebsites.net/api/students/student-profile/$upi";
+    final url =
+        "https://student-nemis-dbb3c9etf0bbgqd5.southafricanorth-01.azurewebsites.net/api/students/student-profile/$upi";
 
-  try {
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-    ).timeout(const Duration(seconds: 40));
+    try {
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {'Content-Type': 'application/json; charset=UTF-8'},
+          )
+          .timeout(const Duration(seconds: 40));
 
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      if (decoded != null) {
-        setState(() {
-          _firstNameController.text = decoded['fullName']['firstName'] ?? '';
-          _middleNameController.text = decoded['fullName']['middleName'] ?? '';
-          _lastNameController.text = decoded['fullName']['lastName'] ?? '';
-          _selectedGender = decoded['gender'] ?? '';
-          _dobController.text = decoded['dateOfBirth'] ?? '';
-          _nationalityController.text = decoded['nationality'] ?? '';
-          _isLoading = false;
-        });
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded != null) {
+          setState(() {
+            _firstNameController.text = decoded['fullName']['firstName'] ?? '';
+            _middleNameController.text =
+                decoded['fullName']['middleName'] ?? '';
+            _lastNameController.text = decoded['fullName']['lastName'] ?? '';
+            _selectedGender = decoded['gender'] ?? '';
+            _dobController.text = decoded['dateOfBirth'] ?? '';
+            _nationalityController.text = decoded['nationality'] ?? '';
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            showError = true;
+            _isLoading = false;
+            _firstNameController.text = '';
+            _middleNameController.text = '';
+            _lastNameController.text = '';
+            _selectedGender = '';
+            _dobController.text = '';
+            _nationalityController.text = '';
+          });
+        }
       } else {
         setState(() {
-          showError = true;
           _isLoading = false;
+          showError = true;
+          _firstNameController.text = '';
+          _middleNameController.text = '';
+          _lastNameController.text = '';
+          _selectedGender = '';
+          _dobController.text = '';
+          _nationalityController.text = '';
         });
       }
-    } else {
-      setState(() { _isLoading = false;
+    } catch (e) {
+      setState(() {
         showError = true;
+        _isLoading = false;
+        _firstNameController.text = '';
+        _middleNameController.text = '';
+        _lastNameController.text = '';
+        _selectedGender = '';
+        _dobController.text = '';
+        _nationalityController.text = '';
       });
     }
-  } catch (e) {
-    setState(() {
-      showError = true;
-      _isLoading = false;
-    });
   }
-}
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -195,18 +218,18 @@ Future<void> _fetchStudentDetailsByUPI() async {
                             ),
                             _isLoading
                                 ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
+                                  color: Colors.white,
+                                )
                                 : const SizedBox.shrink(),
 
                             showError
                                 ? Text(
-                                    'No student found with this UPI',
-                                    style: TextStyle(
-                                      color: Colors.red[900],
-                                      fontSize: 16.0,
-                                    ),
-                                  )
+                                  'No student found with this UPI',
+                                  style: TextStyle(
+                                    color: Colors.red[900],
+                                    fontSize: 16.0,
+                                  ),
+                                )
                                 : const SizedBox.shrink(),
                             const SizedBox(height: 16),
                             TextFormField(
