@@ -22,7 +22,14 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.2'  # Adjust as needed
+          flutter-version: '3.13.9'  # Adjust as needed
+      - name: Use correct Dart SDK
+        run: echo "$FLUTTER_ROOT/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+
+      - name: Show versions
+        run: |
+          flutter --version
+          dart --version
 
       - name: Enable Flutter Web
         run: flutter config --enable-web
