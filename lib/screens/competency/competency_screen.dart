@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class CompetencyInputScreen extends StatefulWidget {
+  const CompetencyInputScreen({super.key});
+
   @override
   _CompetencyInputScreenState createState() => _CompetencyInputScreenState();
 }

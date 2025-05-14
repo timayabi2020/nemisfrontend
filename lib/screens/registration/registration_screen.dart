@@ -306,8 +306,9 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration('Email Address'),
                               validator: (value) {
-                                if (value == null || value.isEmpty)
+                                if (value == null || value.isEmpty) {
                                   return 'Email is required';
+                                }
                                 final emailRegex = RegExp(
                                   r'^[^@]+@[^@]+\.[^@]+',
                                 );
