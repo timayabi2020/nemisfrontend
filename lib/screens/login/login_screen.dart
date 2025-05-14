@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:techhackportal/screens/dashboard/dashboard_screen.dart';
 import 'package:techhackportal/screens/registration/registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -9,7 +10,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
@@ -72,7 +74,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         TextField(
                           decoration: InputDecoration(
                             hintText: 'Unique Personal Identifier',
-                            prefixIcon: const Icon(Icons.person_2_rounded, color: Colors.white),
+                            prefixIcon: const Icon(
+                              Icons.person_2_rounded,
+                              color: Colors.white,
+                            ),
                             hintStyle: const TextStyle(color: Colors.white70),
                             filled: true,
                             fillColor: Colors.transparent,
@@ -92,7 +97,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Password',
-                            prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                            prefixIcon: const Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                            ),
                             hintStyle: const TextStyle(color: Colors.white70),
                             filled: true,
                             fillColor: Colors.transparent,
@@ -124,9 +132,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white70,
-                              padding: const EdgeInsets.symmetric(vertical: 16.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                              ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AdminDashboard(),
+                                ),
+                              );
+                            },
                             child: const Text(
                               'Log In',
                               style: TextStyle(
@@ -147,20 +164,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 TextSpan(
                                   text: 'Sign up',
                                   style: const TextStyle(color: Colors.white70),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const StudentRegistrationScreen(),
-                                        ),
-                                      );
-                                    },
+                                  recognizer:
+                                      TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const StudentRegistrationScreen(),
+                                            ),
+                                          );
+                                        },
                                 ),
                               ],
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
