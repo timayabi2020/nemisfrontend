@@ -103,7 +103,8 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+
+    if (_formKey.currentState!.validate() && !showError) {
       showDialog(
         context: context,
         builder:
