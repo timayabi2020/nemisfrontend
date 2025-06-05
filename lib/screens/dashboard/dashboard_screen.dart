@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:techhackportal/screens/history/studenthistory.dart';
 import 'package:techhackportal/screens/login/login_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key, required String studentid, required refreshtoken, required token});
+  final String studentid;
+  final String refreshtoken;
+  final String token;
+  const AdminDashboard({super.key,  required this.studentid, required this.refreshtoken, required this.token});
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
@@ -12,22 +16,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
   int _selectedIndex = 0;
   bool _isSidebarVisible = false;
   final Duration _sidebarAnimationDuration = Duration(milliseconds: 300);
-
+  Widget _selectedWidget = const Center(
+    child: Text(
+      'Welcome to the Student Dashboard',
+      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+    ),
+  );
   void _onDestinationSelected(int index) {
     setState(() {
       _selectedIndex = index;
+
+      // 2️⃣ Update the selected widget based on the index
+      switch (index) {
+        case 0:
+          _selectedWidget = Center(
+             child: Text(
+      'Welcome to the Student Dashboard',
+      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+    ),
+          );
+          break;
+        case 1:
+          _selectedWidget = Center(
+            child: StudentSchoolHistoryPage(studentid:widget.studentid),
+          );
+          break;
+
+      }
     });
-    switch (index) {
-      case 0:
-        Navigator.pushNamed(context, '/programs');
-        break;
-      case 1:
-        Navigator.pushNamed(context, '/analytics');
-        break;
-      case 2:
-        Navigator.pushNamed(context, '/settings');
-        break;
-    }
   }
 
   void _confirmLogout() {
@@ -145,31 +161,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ? ListView(
                         padding: const EdgeInsets.only(top: 20),
                         children: [
-                          StatefulBuilder(
-                          builder: (context, setHoverState) {
-                            bool isHovered = false;
-                            return MouseRegion(
-                      onEnter: (_) => setHoverState(() => isHovered = true),
-                      onExit: (_) => setHoverState(() => isHovered = false),
-                              child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    decoration: BoxDecoration(
-                                      color: isHovered ? Colors.green.shade700 : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: ListTile(
-                                      leading: const Icon(Icons.school, color: Colors.white),
-                                      selectedTileColor: Colors.black45,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                      title: const Text('Programs', style: TextStyle(color: Colors.white)),
-                                      selected: _selectedIndex == 0,
-                                      onTap: () => _onDestinationSelected(0),
-                                    ),
-                                  )
-                                
-                            );
-                          }),
-                          StatefulBuilder(
+                                                                              StatefulBuilder(
                           builder: (context, setHoverState) {
                             bool isHovered = false;
                             return MouseRegion(
@@ -182,39 +174,44 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 ),
                                 child: ListTile(
                                   //contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                                  leading: const Icon(Icons.insights, color: Colors.white),
+                                  leading: const Icon(Icons.dashboard, color: Colors.white),
                                   selectedTileColor: Colors.black45,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  title: const Text('Analytics', style: TextStyle(color: Colors.white)),
+                                  title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+                                  selected: _selectedIndex == 0,
+                                  onTap: () => _onDestinationSelected(0),
+                                ),
+                                
+                              ),
+                            );
+                          }),
+
+
+                                                    StatefulBuilder(
+                          builder: (context, setHoverState) {
+                            bool isHovered = false;
+                            return MouseRegion(
+                              onEnter: (_) => setHoverState(() => isHovered = true),
+                              onExit: (_) => setHoverState(() => isHovered = false),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isHovered ? Colors.green.shade700 : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ListTile(
+                                  //contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                                  leading: const Icon(Icons.history_edu, color: Colors.white),
+                                  selectedTileColor: Colors.black45,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  title: const Text('History', style: TextStyle(color: Colors.white)),
                                   selected: _selectedIndex == 1,
                                   onTap: () => _onDestinationSelected(1),
                                 ),
+                                
                               ),
                             );
                           }),
-                          StatefulBuilder(
-                          builder: (context, setHoverState) {
-                            bool isHovered = false;
-                            return MouseRegion(
-                              onEnter: (_) => setHoverState(() => isHovered = true),
-                              onExit: (_) => setHoverState(() => isHovered = false),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: isHovered ? Colors.green.shade700 : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ListTile(
-                                  //contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                                  leading: const Icon(Icons.settings, color: Colors.white),
-                                  selectedTileColor: Colors.black45,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  title: const Text('Settings', style: TextStyle(color: Colors.white)),
-                                  selected: _selectedIndex == 2,
-                                  onTap: () => _onDestinationSelected(2),
-                                ),
-                              ),
-                            );
-                          }),
+
                           const Divider(color: Colors.white70),
                           StatefulBuilder(
                             
@@ -245,28 +242,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
             
           
           Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'Welcome to the Student Dashboard',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Use the sidebar to navigate through the dashboard.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
+           
+             child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: _selectedWidget,
             ),
           ),
         ],
