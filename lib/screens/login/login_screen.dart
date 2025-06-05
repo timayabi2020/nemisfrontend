@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:techhackportal/config.dart';
 import 'package:techhackportal/screens/dashboard/dashboard_screen.dart';
 import 'package:techhackportal/screens/registration/registration_screen.dart';
 
@@ -14,6 +18,8 @@ class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _upiController = TextEditingController();
 
   @override
   void initState() {
@@ -72,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         const SizedBox(height: 24.0),
                         TextField(
+                          controller: _upiController,
                           decoration: InputDecoration(
                             hintText: 'Unique Personal Identifier',
                             prefixIcon: const Icon(
@@ -94,6 +101,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         const SizedBox(height: 16.0),
                         TextField(
+                          controller: _passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Password',
@@ -137,12 +145,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AdminDashboard(),
-                                ),
-                              );
+                             _login();
                             },
                             child: const Text(
                               'Log In',
@@ -192,4 +195,73 @@ class _LoginScreenState extends State<LoginScreen>
       ),
     );
   }
-}
+  
+  void _login() {
+    // call the login API here
+
+ final studentData = {
+        'username': _upiController.text.trim(),
+        'password': _passwordController.text.trim(),
+      };
+
+
+
+      final url = Uri.parse(LOGIN);
+      http.post(
+        url,
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode(studentData),
+      ).then((response) {
+        var decodedResponse = jsonDecode(response.body);
+        if (response.statusCode == 200) {
+          // Handle successful login
+          var token = decodedResponse['access'];
+          var refresh = decodedResponse['refresh'];
+
+        
+
+          // Navigate to the dashboard or home screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminDashboard(studentid: _upiController.text.trim(), token: token, refreshtoken: refresh)
+            ),
+          );
+         
+        } else {
+          // Handle error response
+         var errorMessage = decodedResponse['detail'] ?? 'Login failed';
+          _showSuccessDialog(errorMessage, "Fail");
+        }
+      }).catchError((error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error occurred. Please try again.')),
+        );
+      });
+
+    }
+  void _showSuccessDialog(String message, String title) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content:Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+  }
+

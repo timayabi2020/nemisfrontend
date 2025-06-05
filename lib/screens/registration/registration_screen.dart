@@ -28,12 +28,13 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  String? _selectedGender;
+  String _selectedGender = 'Male';
   String noStudentFound = "No student found with this UPI";
 
   bool _isLoading = false;
 
   bool showError = false;
+  bool fetchSuccess = false;
 
   Future<void> _fetchStudentDetailsByUPI() async {
     final upi = _upiController.text.trim();
@@ -63,10 +64,11 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
             _middleNameController.text =
                 decoded['fullName']['middleName'] ?? '';
             _lastNameController.text = decoded['fullName']['lastName'] ?? '';
-            _selectedGender = decoded['gender'] ?? '';
+            _selectedGender = decoded['gender'] ?? 'Male';
             _dobController.text = decoded['dateOfBirth'] ?? '';
             _nationalityController.text = decoded['nationality'] ?? '';
             _isLoading = false;
+            fetchSuccess = true;
           });
         } else {
           setState(() {
@@ -75,9 +77,10 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
             _firstNameController.text = '';
             _middleNameController.text = '';
             _lastNameController.text = '';
-            _selectedGender = '';
+            _selectedGender = 'Male';
             _dobController.text = '';
             _nationalityController.text = '';
+            fetchSuccess = false;
           });
         }
       } else {
@@ -87,9 +90,10 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
           _firstNameController.text = '';
           _middleNameController.text = '';
           _lastNameController.text = '';
-          _selectedGender = '';
+          _selectedGender = 'Male';
           _dobController.text = '';
           _nationalityController.text = '';
+          fetchSuccess = false;
         });
       }
     } catch (e) {
@@ -99,9 +103,10 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
         _firstNameController.text = '';
         _middleNameController.text = '';
         _lastNameController.text = '';
-        _selectedGender = '';
+        _selectedGender = 'Male';
         _dobController.text = '';
         _nationalityController.text = '';
+        fetchSuccess = false;
       });
     }
   }
@@ -112,8 +117,8 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
       final studentData = {
         'username': _upiController.text.trim(),
         'email': _emailController.text.trim(),
-        'studentid': _upiController.text.trim(),
-        'password': _lastNameController.text.trim(),
+        'student_id': _upiController.text.trim(),
+        'password': _passwordController.text.trim(),
       };
 
       // Here you would typically send the studentData to your backend API
@@ -126,12 +131,13 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: jsonEncode(studentData),
       ).then((response) {
-        if (response.statusCode == 200) {
-          _showSuccessDialog();
+        var decodedResponse = jsonDecode(response.body);
+        if (response.statusCode == 201) {
+          _showSuccessDialog("Student registration submitted successfully.", "Success");
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration failed. Please try again.')),
-          );
+          // Handle error response
+          var errorMessage = decodedResponse['student_id'][0] ?? 'Registration failed';
+          _showSuccessDialog(errorMessage, "Fail");
         }
       }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -315,7 +321,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                                       .toList(),
                               onChanged:
                                   (value) =>
-                                      setState(() => _selectedGender = value),
+                                      setState(() => _selectedGender = value!),
                             ),
                             const SizedBox(height: 16),
                             GestureDetector(
@@ -380,26 +386,28 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                               },
                             ),
                             const SizedBox(height: 24),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white70,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
+                            if (fetchSuccess) ...[
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white70,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0,
+                                    ),
                                   ),
-                                ),
-                                onPressed: _submitForm,
-                                child: const Text(
-                                  'Submit',
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                  onPressed: _submitForm,
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                             const SizedBox(height: 12),
                             TextButton(
                               style: TextButton.styleFrom(
@@ -441,12 +449,12 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     );
   }
   
-  void _showSuccessDialog() {
+  void _showSuccessDialog(String message, String title) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Success'),
-        content: const Text('Student registration submitted successfully.'),
+        title: Text(title),
+        content:Text(message),
         actions: [
           TextButton(
             onPressed: () {

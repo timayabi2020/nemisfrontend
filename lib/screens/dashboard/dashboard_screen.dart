@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+  const AdminDashboard({super.key, required String studentid, required refreshtoken, required token});
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
