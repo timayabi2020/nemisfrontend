@@ -111,7 +111,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
 
     if (_formKey.currentState!.validate() && !showError) {
       final studentData = {
@@ -135,11 +135,13 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
         if (response.statusCode == 201) {
           _showSuccessDialog("Student registration submitted successfully.", "Success");
         } else {
+          Navigator.of(context).pop(); // Close the loading dialog
           // Handle error response
           var errorMessage = decodedResponse['student_id'][0] ?? 'Registration failed';
           _showSuccessDialog(errorMessage, "Fail");
         }
       }).catchError((error) {
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('An error occurred. Please try again.')),
         );
@@ -396,7 +398,9 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                                       vertical: 16.0,
                                     ),
                                   ),
-                                  onPressed: _submitForm,
+                                  onPressed: () {
+                                    buildShowdialog(context);
+                                  },
                                   child: const Text(
                                     'Submit',
                                     style: TextStyle(
@@ -448,7 +452,25 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
       ),
     );
   }
-  
+  buildShowdialog(BuildContext context){
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+
+        content: Row(
+          children: [
+CircularProgressIndicator(color: Colors.white,),
+            Container(
+              margin: const EdgeInsets.only(left: 7),
+              child: const Text("Registering user..."),
+            ),
+          ],
+        ),
+      ),
+    );
+    //_loginUser(context);
+    _submitForm(context);
+  }
   void _showSuccessDialog(String message, String title) {
     showDialog(
       context: context,
