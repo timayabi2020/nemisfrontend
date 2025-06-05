@@ -21,6 +21,8 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _upiController = TextEditingController();
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -145,8 +147,10 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                             onPressed: () {
-                             _login();
+                             buildShowdialog(context);
+
                             },
+
                             child: const Text(
                               'Log In',
                               style: TextStyle(
@@ -196,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
   
-  void _login() {
+  void _loginUser(BuildContext context) {
     // call the login API here
 
  final studentData = {
@@ -230,16 +234,36 @@ class _LoginScreenState extends State<LoginScreen>
          
         } else {
           // Handle error response
+          Navigator.of(context).pop(); // Close the loading dialog
          var errorMessage = decodedResponse['detail'] ?? 'Login failed';
           _showSuccessDialog(errorMessage, "Fail");
         }
       }).catchError((error) {
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('An error occurred. Please try again.')),
         );
       });
 
     }
+  buildShowdialog(BuildContext context){
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+
+        content: Row(
+          children: [
+CircularProgressIndicator(color: Colors.white,),
+            Container(
+              margin: const EdgeInsets.only(left: 7),
+              child: const Text("Authenticating user..."),
+            ),
+          ],
+        ),
+      ),
+    );
+    _loginUser(context);
+  }
   void _showSuccessDialog(String message, String title) {
     showDialog(
       context: context,
