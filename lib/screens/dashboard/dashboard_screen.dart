@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:techhackportal/screens/login/login_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key, required String studentid, required refreshtoken, required token});
@@ -43,7 +44,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Navigator.pushReplacementNamed(context, '/login');
+                        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginScreen()
+            ),
+          );
             },
             child: const Text('Logout'),
           ),
