@@ -62,8 +62,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
               children: [
                 CompetencyPieChart(competencies: competencies),
                 RecentCompetenciesList(competencies: competencies),
-                StudentProfileCard(studentData: data),
-                SchoolStatusCard(schoolData: school),
+                //StudentProfileCard(studentData: data),
+                //SchoolStatusCard(schoolData: school),
               ],
             ),
           );
@@ -139,7 +139,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
             onSelected: (value) {
               if (value == 'Profile') {
-                Navigator.pushNamed(context, '/profile');
+                _showProfile(context);
               } else if (value == 'Logout') {
                 _confirmLogout();
               }
@@ -340,5 +340,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
       });
     }
+  }
+   void _showProfile(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        //title: Text("My profile"),
+        content:StudentProfileCard(studentData: data),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }

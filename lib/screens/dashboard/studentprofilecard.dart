@@ -45,7 +45,7 @@ class _StudentProfileCardState extends State<StudentProfileCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Student Profile', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('My Profile', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const Divider(),
             Row(children: [
               const Icon(Icons.person, color: Colors.green),
