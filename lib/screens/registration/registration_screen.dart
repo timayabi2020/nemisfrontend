@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:techhackportal/config.dart';
 import 'package:techhackportal/screens/login/login_screen.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
@@ -23,6 +24,9 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   String? _selectedGender;
   String noStudentFound = "No student found with this UPI";
@@ -41,7 +45,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     });
 
     final url =
-        "https://student-nemis-dbb3c9etf0bbgqd5.southafricanorth-01.azurewebsites.net/api/students/student-profile/$upi";
+        "$NEMIS_URI/$upi";
 
     try {
       final response = await http
@@ -105,20 +109,50 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
   void _submitForm() {
 
     if (_formKey.currentState!.validate() && !showError) {
-      showDialog(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('Success'),
-              content: const Text('Student registration submitted.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-      );
+      final studentData = {
+        'username': _upiController.text.trim(),
+        'email': _emailController.text.trim(),
+        'studentid': _upiController.text.trim(),
+        'password': _lastNameController.text.trim(),
+      };
+
+      // Here you would typically send the studentData to your backend API
+//Call your API to register the student
+
+
+      final url = Uri.parse(REGISTRATION);
+      http.post(
+        url,
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode(studentData),
+      ).then((response) {
+        if (response.statusCode == 200) {
+          _showSuccessDialog();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration failed. Please try again.')),
+          );
+        }
+      }).catchError((error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error occurred. Please try again.')),
+        );
+      });
+
+      // showDialog(
+      //   context: context,
+      //   builder:
+      //       (context) => AlertDialog(
+      //         title: const Text('Success'),
+      //         content: const Text('Student registration submitted.'),
+      //         actions: [
+      //           TextButton(
+      //             onPressed: () => Navigator.of(context).pop(),
+      //             child: const Text('OK'),
+      //           ),
+      //         ],
+      //       ),
+      // );
     }
   }
 
@@ -317,6 +351,34 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                                     : 'Invalid email';
                               },
                             ),
+                            const SizedBox(height: 16),
+                                                        TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('Password'),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Password is required'
+                                          : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: true,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _inputDecoration('Confirm Password'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Confirm password is required';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                            ),
                             const SizedBox(height: 24),
                             SizedBox(
                               width: double.infinity,
@@ -373,6 +435,30 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Success'),
+        content: const Text('Student registration submitted successfully.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+            child: const Text('OK'),
           ),
         ],
       ),
