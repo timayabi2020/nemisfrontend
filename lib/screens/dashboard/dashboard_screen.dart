@@ -44,20 +44,30 @@ class _AdminDashboardState extends State<AdminDashboard> {
  Widget _buildDashboardContent() {
     switch (_selectedIndex) {
       case 0: // Programs
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CompetencyPieChart(competencies: data['schoolHistory'][0]['competencies']),
-              RecentCompetenciesList(competencies: data['schoolHistory'][0]['competencies']),
-              StudentProfileCard(studentData: data),
-              SchoolStatusCard(schoolData: data['schoolHistory'][0]),
-              
-              
-            ],
-          ),
-        );
+        if (_isLoading) {
+          // While data is loading
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF006600)));
+        } else if (data.isEmpty || data['schoolHistory'] == null) {
+          // If data didn't load properly
+          return const Center(child: Text('No data available.'));
+        } else {
+          // Data is ready
+          final school = data['schoolHistory'][0];
+          final competencies = school['competencies'];
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CompetencyPieChart(competencies: competencies),
+                RecentCompetenciesList(competencies: competencies),
+                StudentProfileCard(studentData: data),
+                SchoolStatusCard(schoolData: school),
+              ],
+            ),
+          );
+        }
       case 1: // Analytics
         return StudentSchoolHistoryPage(
           studentid: widget.studentid,
