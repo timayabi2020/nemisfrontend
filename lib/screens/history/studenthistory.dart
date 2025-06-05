@@ -7,8 +7,12 @@ import 'package:techhackportal/config.dart';
 class StudentSchoolHistoryPage extends StatefulWidget {
 
   final String studentid;
+    final Map<String, dynamic> data;
 
-  const StudentSchoolHistoryPage({super.key,  required this.studentid});
+    final Map<String, dynamic> fullName;
+    final List schoolHistory;
+
+  const StudentSchoolHistoryPage({super.key,  required this.studentid, required this.data, required this.fullName, required this.schoolHistory});
 
   @override
   State<StudentSchoolHistoryPage> createState() => _StudentSchoolHistoryPageState();
@@ -17,18 +21,12 @@ class StudentSchoolHistoryPage extends StatefulWidget {
 class _StudentSchoolHistoryPageState extends State<StudentSchoolHistoryPage> {
   bool showError = false;
   bool _isLoading = false;
-  Map<String, dynamic> data = {
-
-  };
-
-    var fullName = {};
-    List schoolHistory =[];
 
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _fetchStudentDetailsByUPI();
+
   }
 
   @override
@@ -44,13 +42,7 @@ class _StudentSchoolHistoryPageState extends State<StudentSchoolHistoryPage> {
       appBar: AppBar(
         title: const Text('Student School History'),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color:Color(0xFF006600) ,))
-          : showError
-              ? const Center(child: Text('Error fetching student data'))
-              : data.isEmpty
-                  ? const Center(child: Text('No data available'))
-                  :
+      body: 
       SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -58,15 +50,15 @@ class _StudentSchoolHistoryPageState extends State<StudentSchoolHistoryPage> {
           children: [
             // Student basic info
             Text(
-              'Student: ${fullName['firstName']} ${fullName['middleName']} ${fullName['lastName']}',
+              'Student: ${widget.fullName['firstName']} ${widget.fullName['middleName']} ${widget.fullName['lastName']}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            Text('UPI: ${data['upi']}'),
-            Text('Gender: ${data['gender']}'),
+            Text('UPI: ${widget.data['upi']}'),
+            Text('Gender: ${widget.data['gender']}'),
             const SizedBox(height: 16),
 
             // School history
-            ...schoolHistory.map((school) {
+            ...widget.schoolHistory.map((school) {
               final competencies = school['competencies'] as List<dynamic>;
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
@@ -106,57 +98,5 @@ class _StudentSchoolHistoryPageState extends State<StudentSchoolHistoryPage> {
       ),
     ));
   }
-   Future<void> _fetchStudentDetailsByUPI() async {
 
-  
-
-    setState(() {
-      _isLoading = true;
-      showError = false;
-    });
-
-    final url =
-        "$NEMIS_URI/${widget.studentid}";
-
-    try {
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: {'Content-Type': 'application/json; charset=UTF-8'},
-          )
-          .timeout(const Duration(seconds: 40));
-
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        if (decoded != null) {
-          setState(() {
-
-            _isLoading = false;
-            data = decoded;
-            fullName = data['fullName'];
-            schoolHistory = data['schoolHistory'] as List<dynamic>;
-  
-          });
-        } else {
-          setState(() {
-            showError = true;
-            _isLoading = false;
-
-          });
-        }
-      } else {
-        setState(() {
-          _isLoading = false;
-          showError = true;
-
-        });
-      }
-    } catch (e) {
-      setState(() {
-        showError = true;
-        _isLoading = false;
-
-      });
-    }
-  }
 }

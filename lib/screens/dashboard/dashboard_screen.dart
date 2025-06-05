@@ -1,4 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:techhackportal/config.dart';
+import 'package:techhackportal/screens/dashboard/competecnycahrt.dart';
+import 'package:techhackportal/screens/dashboard/recentcompetency.dart';
+import 'package:techhackportal/screens/dashboard/schoolstatuscard.dart';
+import 'package:techhackportal/screens/dashboard/studentprofilecard.dart';
 import 'package:techhackportal/screens/history/studenthistory.dart';
 import 'package:techhackportal/screens/login/login_screen.dart';
 
@@ -16,33 +24,59 @@ class _AdminDashboardState extends State<AdminDashboard> {
   int _selectedIndex = 0;
   bool _isSidebarVisible = false;
   final Duration _sidebarAnimationDuration = Duration(milliseconds: 300);
-  Widget _selectedWidget = const Center(
-    child: Text(
-      'Welcome to the Student Dashboard',
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-    ),
-  );
+    bool showError = false;
+  bool _isLoading = false;
+  Map<String, dynamic> data = {
+
+  };
+
+    Map<String, dynamic> fullName = {};
+    List schoolHistory =[];
+
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchStudentDetailsByUPI();
+
+  }
+
+ Widget _buildDashboardContent() {
+    switch (_selectedIndex) {
+      case 0: // Programs
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CompetencyPieChart(competencies: data['schoolHistory'][0]['competencies']),
+              RecentCompetenciesList(competencies: data['schoolHistory'][0]['competencies']),
+              StudentProfileCard(studentData: data),
+              SchoolStatusCard(schoolData: data['schoolHistory'][0]),
+              
+              
+            ],
+          ),
+        );
+      case 1: // Analytics
+        return StudentSchoolHistoryPage(
+          studentid: widget.studentid,
+          data: data,
+          fullName: fullName,
+          schoolHistory: schoolHistory,
+        );
+      case 2: // Settings
+        return const Center(child: Text('Settings Page'));
+      case 3: // History
+        return const Center(child: Text('History Page'));
+      default:
+        return const Center(child: Text('Dashboard'));
+    }
+  }
+
   void _onDestinationSelected(int index) {
     setState(() {
       _selectedIndex = index;
-
-      // 2️⃣ Update the selected widget based on the index
-      switch (index) {
-        case 0:
-          _selectedWidget = Center(
-             child: Text(
-      'Welcome to the Student Dashboard',
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-    ),
-          );
-          break;
-        case 1:
-          _selectedWidget = Center(
-            child: StudentSchoolHistoryPage(studentid:widget.studentid),
-          );
-          break;
-
-      }
     });
   }
 
@@ -161,56 +195,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ? ListView(
                         padding: const EdgeInsets.only(top: 20),
                         children: [
-                                                                              StatefulBuilder(
-                          builder: (context, setHoverState) {
-                            bool isHovered = false;
-                            return MouseRegion(
-                              onEnter: (_) => setHoverState(() => isHovered = true),
-                              onExit: (_) => setHoverState(() => isHovered = false),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: isHovered ? Colors.green.shade700 : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ListTile(
-                                  //contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                                  leading: const Icon(Icons.dashboard, color: Colors.white),
-                                  selectedTileColor: Colors.black45,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
-                                  selected: _selectedIndex == 0,
-                                  onTap: () => _onDestinationSelected(0),
-                                ),
-                                
-                              ),
-                            );
-                          }),
+                            _buildSidebarTile('Dashboard', Icons.dashboard, 0),
+                            _buildSidebarTile('Academic History', Icons.history_edu, 1),
 
-
-                                                    StatefulBuilder(
-                          builder: (context, setHoverState) {
-                            bool isHovered = false;
-                            return MouseRegion(
-                              onEnter: (_) => setHoverState(() => isHovered = true),
-                              onExit: (_) => setHoverState(() => isHovered = false),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: isHovered ? Colors.green.shade700 : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ListTile(
-                                  //contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                                  leading: const Icon(Icons.history_edu, color: Colors.white),
-                                  selectedTileColor: Colors.black45,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  title: const Text('History', style: TextStyle(color: Colors.white)),
-                                  selected: _selectedIndex == 1,
-                                  onTap: () => _onDestinationSelected(1),
-                                ),
-                                
-                              ),
-                            );
-                          }),
 
                           const Divider(color: Colors.white70),
                           StatefulBuilder(
@@ -239,17 +226,109 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ),
               ),
+              Expanded(child: _buildDashboardContent()),
             
           
-          Expanded(
+          // Expanded(
            
-             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: _selectedWidget,
-            ),
-          ),
+          //    child: _isLoading
+          //       ? Center(
+          //           child: CircularProgressIndicator(),
+          //         )
+          //       : showError
+          //           ? Center(
+          //               child: Text(
+          //                 'Error fetching data. Please try again later.',
+          //                 style: TextStyle(color: Colors.red, fontSize: 18),
+          //               ),
+          //             )
+          //           : 
+          //    AnimatedSwitcher(
+          //     duration: const Duration(milliseconds: 300),
+          //     switchInCurve: Curves.easeIn,
+
+          //     child: _selectedWidget,
+          //   ),
+          // ),
         ],
       ),
     );
+  }
+   Widget _buildSidebarTile(String title, IconData icon, int index) {
+    return StatefulBuilder(
+      builder: (context, setHoverState) {
+        bool isHovered = false;
+        return MouseRegion(
+          onEnter: (_) => setHoverState(() => isHovered = true),
+          onExit: (_) => setHoverState(() => isHovered = false),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isHovered ? Colors.green.shade700 : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListTile(
+              leading: Icon(icon, color: Colors.white),
+              title: Text(title, style: const TextStyle(color: Colors.white)),
+              selected: _selectedIndex == index,
+              onTap: () => _onDestinationSelected(index),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+     Future<void> _fetchStudentDetailsByUPI() async {
+
+  
+
+    setState(() {
+      _isLoading = true;
+      showError = false;
+    });
+
+    final url =
+        "$NEMIS_URI/${widget.studentid}";
+
+    try {
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {'Content-Type': 'application/json; charset=UTF-8'},
+          )
+          .timeout(const Duration(seconds: 40));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded != null) {
+          setState(() {
+
+            _isLoading = false;
+            data = decoded;
+            fullName = data['fullName'];
+            schoolHistory = data['schoolHistory'] as List<dynamic>;
+  
+          });
+        } else {
+          setState(() {
+            showError = true;
+            _isLoading = false;
+
+          });
+        }
+      } else {
+        setState(() {
+          _isLoading = false;
+          showError = true;
+
+        });
+      }
+    } catch (e) {
+      setState(() {
+        showError = true;
+        _isLoading = false;
+
+      });
+    }
   }
 }
