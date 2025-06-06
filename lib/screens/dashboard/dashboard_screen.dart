@@ -208,7 +208,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         children: [
                             _buildSidebarTile('Dashboard', Icons.dashboard, 0),
                             _buildSidebarTile('Academic History', Icons.history_edu, 1),
-                            _buildSidebarTile('Available Programs', Icons.school, 2),
+                            _buildSidebarTile('Search Programs', Icons.search, 2),
 
 
                           const Divider(color: Colors.white70),
