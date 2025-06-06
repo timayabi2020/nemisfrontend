@@ -9,6 +9,7 @@ import 'package:techhackportal/screens/dashboard/schoolstatuscard.dart';
 import 'package:techhackportal/screens/dashboard/studentprofilecard.dart';
 import 'package:techhackportal/screens/history/studenthistory.dart';
 import 'package:techhackportal/screens/login/login_screen.dart';
+import 'package:techhackportal/screens/programs/programsearch.dart';
 
 class AdminDashboard extends StatefulWidget {
   final String studentid;
@@ -76,7 +77,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           schoolHistory: schoolHistory,
         );
       case 2: // Settings
-        return const Center(child: Text('Settings Page'));
+        return ProgramSearchPage();
       case 3: // History
         return const Center(child: Text('History Page'));
       default:
@@ -207,6 +208,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         children: [
                             _buildSidebarTile('Dashboard', Icons.dashboard, 0),
                             _buildSidebarTile('Academic History', Icons.history_edu, 1),
+                            _buildSidebarTile('Available Programs', Icons.school, 2),
 
 
                           const Divider(color: Colors.white70),
