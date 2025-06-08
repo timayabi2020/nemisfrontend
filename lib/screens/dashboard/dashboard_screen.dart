@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:techhackportal/config.dart';
+import 'package:techhackportal/screens/chatbot/chatbot.dart';
 import 'package:techhackportal/screens/dashboard/competecnycahrt.dart';
 import 'package:techhackportal/screens/dashboard/recentcompetency.dart';
 import 'package:techhackportal/screens/dashboard/schoolstatuscard.dart';
@@ -79,7 +80,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 2: // Settings
         return ProgramSearchPage();
       case 3: // History
-        return const Center(child: Text('History Page'));
+        return ChatBotPage(schoolHistory: schoolHistory.cast<Map<String, dynamic>>());
       default:
         return const Center(child: Text('Dashboard'));
     }
@@ -209,6 +210,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             _buildSidebarTile('Dashboard', Icons.dashboard, 0),
                             _buildSidebarTile('Academic History', Icons.history_edu, 1),
                             _buildSidebarTile('Search Programs', Icons.search, 2),
+                            _buildSidebarTile('Career Advisor', Icons.support_agent_outlined, 3),
 
 
                           const Divider(color: Colors.white70),
