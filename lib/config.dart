@@ -8,3 +8,4 @@ const COURSES = "$BASE_URL/academics/courses/";
 const INSTITUTIONS = "$BASE_URL/academics/institutions/";
 const UNITS = "$BASE_URL/academics/units/";
 const CHATBOT = "$BASE_URL/chat/";
+const EXAMS_REGISTRATION = "$BASE_URL/exams/registrations/";

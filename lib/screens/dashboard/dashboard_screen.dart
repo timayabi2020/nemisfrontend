@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:techhackportal/config.dart';
 import 'package:techhackportal/screens/chatbot/chatbot.dart';
+import 'package:techhackportal/screens/coursesearch/coursesearch.dart';
 import 'package:techhackportal/screens/dashboard/competecnycahrt.dart';
 import 'package:techhackportal/screens/dashboard/recentcompetency.dart';
 import 'package:techhackportal/screens/dashboard/schoolstatuscard.dart';
@@ -77,12 +78,37 @@ class _AdminDashboardState extends State<AdminDashboard> {
           fullName: fullName,
           schoolHistory: schoolHistory,
         );
-      case 2: // Settings
+      case 2: // Program Search
         return ProgramSearchPage();
-      case 3: // History
+      case 3: // Chatbot
         return ChatBotPage(schoolHistory: schoolHistory.cast<Map<String, dynamic>>());
+      case 4: // Course Search
+        return CourseSearchPage(token: widget.token, refreshtoken: widget.refreshtoken);
       default:
-        return const Center(child: Text('Dashboard'));
+                if (_isLoading) {
+          // While data is loading
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF006600)));
+        } else if (data.isEmpty || data['schoolHistory'] == null) {
+          // If data didn't load properly
+          return const Center(child: Text('No data available.'));
+        } else {
+          // Data is ready
+          final school = data['schoolHistory'][0];
+          final competencies = school['competencies'];
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CompetencyPieChart(competencies: competencies),
+                RecentCompetenciesList(competencies: competencies),
+                //StudentProfileCard(studentData: data),
+                //SchoolStatusCard(schoolData: school),
+              ],
+            ),
+          );
+        }
     }
   }
 
@@ -211,6 +237,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             _buildSidebarTile('Academic History', Icons.history_edu, 1),
                             _buildSidebarTile('Search Programs', Icons.search, 2),
                             _buildSidebarTile('Career Advisor', Icons.support_agent_outlined, 3),
+                            _buildSidebarTile('Exam Registration', Icons.pending_actions, 4),
 
 
                           const Divider(color: Colors.white70),
